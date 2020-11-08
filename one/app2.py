@@ -4,13 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test3.sqlite3'
 app.config['SECRET_KEY'] = "random string"
 db = SQLAlchemy(app)
 class users(db.Model):
     __tablename__ = 'user1'
     id = db.Column( db.String(20), primary_key = True)
-    to=db.Column(db.Integer)
+    to=db.Column(db.String(100))
     from1=db.Column(db.Integer)
 
     def __init__(self, id, to, from1):
@@ -69,12 +69,12 @@ def jump(id):
                 print(type(users))
                 user=users.query.filter_by(id=id).first()
                 print(user.id,user.to,user.from1)
-                if(user.to!=0):
+                if(user.to!=''):
                     return render_template('error1.html')
 
             else:
                 print("新用户注册\n")
-                user=users(id,0,int(from1))
+                user=users(id,'',int(from1))
                 db.session.add(user)
                 db.session.commit()
         return render_template('home.html',uid=id)
@@ -110,6 +110,15 @@ def jump(id):
 def jump2(id):
     to1 = 0
     user = users.query.filter_by(id=id).first()
+    for i in range(1,12):
+        att = 'hobby' + str(i)
+        try:
+            if not request.form[att]:
+                continue
+            if i==user.from1:
+                return render_template('error3.html',uid=id)
+        except:
+            pass
     for i in range(1, 12):
         att = 'hobby' + str(i)
         # print(att)
@@ -117,23 +126,25 @@ def jump2(id):
             if not request.form[att]:
                 continue
             print(request.form[att], '1111\n')
-            if to1 == 0:
-                if i==user.from1:
-                    return render_template('error3.html',uid=id)
-                    # return render_template('index.js', uid=id)
-                to1 = i
-            else:
-                print('fail\n')
-                return render_template('error2.html',uid=id)
+            # if i==user.from1:
+            #     return render_template('error3.html',uid=id)
+                # return render_template('index.js', uid=id)
+            user.to=user.to+str(i)+' '
+            tt = tts.query.filter_by(name=to1).first()
+            tt.number = tt.number + 1
+            print(tt.number, '11')
+            db.session.commit()
         except:
             pass
-    user.to = to1
-    print(to1)    #注意取消注释
-    # db.session.commit()
-    tt=tts.query.filter_by(name=to1).first()
-    tt.number=tt.number+1
-    print(tt.number,'11')
+    print(user.to)
     db.session.commit()
+    # user.to = to1
+    # print(to1)    #注意取消注释
+    # db.session.commit()
+    # tt=tts.query.filter_by(name=to1).first()
+    # tt.number=tt.number+1
+    # print(tt.number,'11')
+    # db.session.commit()
     return render_template('success.html')
 
 @app.route('/jump3/<id>',methods=['GET','POST'])
