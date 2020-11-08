@@ -60,10 +60,12 @@ def jump(id):
         else:
             id=request.form['id']
             from1=request.form['from']
+
             # user = users.query.filter_by(id=id).first()
             # user.from1=int(from1)
             # db.session.commit()
-
+            if int(from1)<=0 or int(from1)>=12:
+                return render_template('error2.html')
             if users.query.filter_by(id=id).all():
                 print("数据库已存在用户\n")
                 print(type(users))
