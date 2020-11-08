@@ -1,61 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>小组投票</title>
+    <meta charset="UTF-8">
+    <title>搜索</title>
+    <style>
+        :root {
+            --grad-1: rgb(128,179,171);
+            --grad-2: rgb(30,41,58);
+        }
 
-<!-- 这里使用了一张背景，注释掉了。-->
-<body style="background-image:{{ url_for('static',filename='1.jpg') }}; background-size:100%; background-repeat: no-repeat;">
+        #gradient {
+            background-repeat: no-repeat;
+            background-attachment:fixed;
+            position: absolute;
+            height: 1000px;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(128,179,171);
+            background: linear-gradient(45deg, var(--grad-1) 0%, var(--grad-2) 100%);
+        }
+        table{border-collapse:collapse} /*合并间距*/
+        /*table,table th,table td{border:1px solid #ddd} !*表格带线框,6像素的间距*!*/
+        table th,table td{padding:6px} /*单元格6像素的间距*/
+        table th{background-color:#eee} /*表头带背景色*/
+        html {
+            width: 100%;
+            height: 2000px;
 
-    <!--div align="center"><img src="1.jpg" /></div-->
-    <div  align="center">
-    <h4>小组投票结果</h4>
-        <table id="main" >
-            <thead>
-        <th>小组        </th>   {# 第一列 #}
-        <th>票数        </th>    {# 第二列 #}
-    </thead>
-    <tbody>
-        {% for tt in tts %}
-            <tr>        {# 一个tr代表的是一行 #}
-                <td>{{ tt.name }}</td>
-                <td>{{ tt.number }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-        </table>
+        }
+        .rtable{
+            /*margin:50px 50px 50px 50px*/
+
+        }
+        .search{
+            position:absolute;
+            /*bottom: 100px;*/
+            /*left:560px;*/
+        }
+        .stable{
+            position:relative;
+            /*border: 2px solid #000000;*/
+            background-color: rgb(90, 96, 93,0.3);
+            /*margin:50px 50px 50px 50px;*/
+            border-radius: 10px;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            -o-border-radius: 10px;
+            /*width:1000px*/
+            cellpadding:100px;
+            /*mso-cellspacing: 1000px;*/
+
+        }
+        .content {
+            /*margin: 0 auto; !*水平居中*/
+            position: relative;
+            top: 10%; /*偏移*/
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+        .clear{clear:both;} /* 清除空白盒子的所有浮动 */
+    </style>
+</head>
+<body id="gradient">
+
+<div class="content" align="center">
+    <div>
+
+        <div class ="search" >
+            <h4>小组投票结果</h4>
+            <div class="stable">
+                <table id="rtable" >
+                    <thead>
+                    <th>小组        </th>   {# 第一列 #}
+                    <th>票数        </th>    {# 第二列 #}
+                    </thead>
+                    <tbody>
+                    {% for tt in tts %}
+                    <tr>        {# 一个tr代表的是一行 #}
+                        <td>{{ tt.name }}</td>
+                        <td>{{ tt.number }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="clear"></div>
+        </div>
     </div>
+</div>
 </body>
-<script type="text/javascript">
+</html>
+<script>
+    // rgb vals of the gradients
+    var gradients = [
+        { start: [128,179,171], stop: [30,41,58] },
+        { start: [255,207,160], stop: [234,92,68] },
+        { start: [212,121,121], stop: [130,105,151] }
+    ];
+    // how long for each transition
+    var transitionTime = 4;
 
+    // internal type vars
+    var currentIndex = 0; // where we are in the gradients array
+    var nextIndex = 1; // what index of the gradients array is next
+    var stepsCount = 0; // steps counter
+    var stepsTotal = Math.round(transitionTime * 60); // total amount of steps
+    var rgbSteps = {
+        start: [0,0,0],
+        stop: [0,0,0]
+    }; // how much to alter each rgb value
+    var rgbValues = {
+        start: [0,0,0],
+        stop: [0,0,0]
+    }; // the current rgb values, gets altered by rgb steps on each interval
+    var color1, color2;
 
+    // sets next current and next index of gradients array
+    function setNext(num) {
+        return (num + 1 < gradients.length) ? num + 1 : 0;
+    }
 
+    // work out how big each rgb step is
+    function calcStepSize(a,b) {
+        return (a - b) / stepsTotal;
+    }
 
-
- 
-    //在每个投票选项后面写了个div，用div的宽度来代表当前该选项的投票数。
-   /* function vote(){    //函数vote，当点击确认投票的时候，调用vote方法
-        
-        //for循环的条件是，所有投票选项的个数。
-        for(var i = 0; i < document.getElementsByName("option").length; i++){
-            
-            //查找到是哪个投票选项被选中
-            if(document.getElementsByName("option")[i].checked == true){
-                var width = document.getElementById(i).style.width; //获取到当前选项的宽度。
-                width = parseInt(width);//将宽度转化为int型，因为获取到的width的单位是px
-                width += 3;//改变width的值，这里就是定义每次投票的进度条的增速
-                document.getElementById(i).style.width = width+"px";//修改原div的宽度
-                
-                var label = "label"+i;//lable标签里面写的是当前的投票数目。
-                var num = document.getElementById(label).innerText;//获取到当前的票数
-                document.getElementById(label).innerText = ++num;//票数加1，并修改原值
+    // populate the rgbValues and rgbSteps objects
+    function calcSteps() {
+        for (var key in rgbValues) {
+            if (rgbValues.hasOwnProperty(key)) {
+                for(var i = 0; i < 3; i++) {
+                    rgbValues[key][i] = gradients[currentIndex][key][i];
+                    rgbSteps[key][i] = calcStepSize(
+                        gradients[nextIndex][key][i], rgbValues[key][i]
+                    );
+                }
             }
         }
-        */
- 
-        //alert("完成");
-        
     }
- 
+
+    // update current rgb vals, update DOM element with new CSS background
+    function updateGradient(){
+        // update the current rgb vals
+        for (var key in rgbValues) {
+            if (rgbValues.hasOwnProperty(key)) {
+                for(var i = 0; i < 3; i++) {
+                    rgbValues[key][i] += rgbSteps[key][i];
+                }
+            }
+        }
+
+        // generate CSS rgb values
+        var tColor1 = 'rgb('+(rgbValues.start[0] | 0)+','+(rgbValues.start[1] | 0)+','+(rgbValues.start[2] | 0)+')';
+        var tColor2 = 'rgb('+(rgbValues.stop[0] | 0)+','+(rgbValues.stop[1] | 0)+','+(rgbValues.stop[2] | 0)+')';
+
+        // has anything changed on this interation
+        if (tColor1 != color1 || tColor2 != color2) {
+
+            // update cols strings
+            color1 = tColor1;
+            color2 = tColor2;
+
+            // update :root vars
+            document.documentElement.style.setProperty('--grad-1', color1);
+            document.documentElement.style.setProperty('--grad-2', color2);
+        }
+
+        // we did another step
+        stepsCount++;
+        // did we do too many steps?
+        if (stepsCount > stepsTotal) {
+            // reset steps count
+            stepsCount = 0;
+            // set new indexs
+            currentIndex = setNext(currentIndex);
+            nextIndex = setNext(nextIndex);
+            // calc steps
+            calcSteps();
+        }
+
+        window.requestAnimationFrame(updateGradient);
+    }
+
+    // initial step calc
+    calcSteps();
+
+    // go go go!
+    window.requestAnimationFrame(updateGradient);
 </script>
-</html>
