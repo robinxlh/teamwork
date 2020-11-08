@@ -34,8 +34,9 @@
             <tr>        {# 一个tr代表的是一行 #}
                 <td>{{ user.id }}</td>
                 <td>{{ user.from1 }}</td>
-                {% if user.to ==0 %}
+                {% if user.to =='' %}
                 <td>还未投票</td>
+{#                    <td>{{ user.to }}</td>#}
                 {% else %}
                 <td>{{ user.to }}</td>
             {% endif %}
