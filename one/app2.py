@@ -107,6 +107,8 @@ def jump(id):
     elif id==4:
         pass
         # return render_template('home.html',uid=id)
+    elif id==5:
+        return render_template('result.html',tts=tts.query.all())
 
 @app.route('/jump2/<id>',methods=['GET','POST'])
 def jump2(id):
@@ -132,9 +134,10 @@ def jump2(id):
             #     return render_template('error3.html',uid=id)
                 # return render_template('index.js', uid=id)
             user.to=user.to+str(i)+' '
-            tt = tts.query.filter_by(name=to1).first()
+            tt = tts.query.filter_by(name=i).first()
             tt.number = tt.number + 1
             print(tt.number, '11')
+            db.session.commit()
             db.session.commit()
         except:
             pass

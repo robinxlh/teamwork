@@ -3,47 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <title>搜索</title>
+    <style>
+       :root {
+  --grad-1: rgb(128,179,171);
+  --grad-2: rgb(30,41,58);
+}
+
+#gradient {
+    background-repeat: no-repeat;
+    background-attachment:fixed;
+  position: absolute;
+    height: 1000px;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgb(128,179,171);
+  background: linear-gradient(45deg, var(--grad-1) 0%, var(--grad-2) 100%);
+}
+        table{border-collapse:collapse} /*合并间距*/
+        /*table,table th,table td{border:1px solid #ddd} !*表格带线框,6像素的间距*!*/
+        table th,table td{padding:6px} /*单元格6像素的间距*/
+        table th{background-color:#eee} /*表头带背景色*/
+        html {
+            width: 100%;
+            height: 2000px;
+
+        }
+        .rtable{
+            /*margin:50px 50px 50px 50px*/
+
+        }
+        .search{
+            position:absolute;
+            /*bottom: 100px;*/
+            /*left:560px;*/
+        }
+        .stable{
+            position:relative;
+            /*border: 2px solid #000000;*/
+            background-color: rgb(90, 96, 93,0.3);
+            /*margin:50px 50px 50px 50px;*/
+            border-radius: 10px;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            -o-border-radius: 10px;
+            /*width:1000px*/
+            cellpadding:100px;
+            /*mso-cellspacing: 1000px;*/
+
+        }
+        .content {
+            /*margin: 0 auto; !*水平居中*/
+            position: relative;
+            top: 30%; /*偏移*/
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+       .clear{clear:both;} /* 清除空白盒子的所有浮动 */
+    </style>
 </head>
-<body>
+<body id="gradient">
 
-<form action="{{ url_for('search') }}" method="post">
-    <table>
-        <tbody>
-            <tr>
-                <td>搜索学号:</td>
-                <td><input type="text" placeholder="请输入学号" name="tid"></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="submit" value="查找"></td>
-            </tr>
-        </tbody>
-    </table>
-</form>
-
-<a href="{{ url_for('jump',id=3) }}">点击我查看所有人</a>
-
-<table>
-    <thead>
-        <th>学号        </th>   {# 第一列 #}
-        <th>来自小组        </th>    {# 第二列 #}
-        <th>投票小组        </th>
-    </thead>
-    <tbody>
-        {% for user in user1 %}
-            <tr>        {# 一个tr代表的是一行 #}
-                <td>{{ user.id }}</td>
-                <td>{{ user.from1 }}</td>
-                {% if user.to =='' %}
-                <td>还未投票</td>
-{#                    <td>{{ user.to }}</td>#}
-                {% else %}
-                <td>{{ user.to }}</td>
-            {% endif %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+<div class="content" align="center">
+    <div>
+        <form action="{{ url_for('search') }}" method="post">
+            <table>
+                <tbody>
+                <tr>
+                    <td>搜索学号:</td>
+                    <td><input type="text" placeholder="请输入学号" name="tid"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="查找"></td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+        <div class ="search" >
+            <a href="{{ url_for('jump',id=3) }}">点击我查看所有人 </a>
+            <div class="stable">
+                <table class="rtable">
+                    <thead>
+                    <tr>
+                        <th>学号        </th>   {# 第一列 #}
+                        <th>来自小组        </th>    {# 第二列 #}
+                        <th>投票小组        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in user1 %}
+                    <tr>        {# 一个tr代表的是一行 #}
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.from1 }}</td>
+                        {% if user.to =='' %}
+                        <td>还未投票</td>
+                        {% else %}
+                        <td>{{ user.to }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+<script>
+    // rgb vals of the gradients
+var gradients = [
+  { start: [128,179,171], stop: [30,41,58] },
+  { start: [255,207,160], stop: [234,92,68] },
+  { start: [212,121,121], stop: [130,105,151] }
+];
+// how long for each transition
+var transitionTime = 4;
+
+// internal type vars
+var currentIndex = 0; // where we are in the gradients array
+var nextIndex = 1; // what index of the gradients array is next
+var stepsCount = 0; // steps counter
+var stepsTotal = Math.round(transitionTime * 60); // total amount of steps
+var rgbSteps = {
+  start: [0,0,0],
+  stop: [0,0,0]
+}; // how much to alter each rgb value
+var rgbValues = {
+  start: [0,0,0],
+  stop: [0,0,0]
+}; // the current rgb values, gets altered by rgb steps on each interval
+var color1, color2;
+
+// sets next current and next index of gradients array
+function setNext(num) {
+  return (num + 1 < gradients.length) ? num + 1 : 0;
+}
+
+// work out how big each rgb step is
+function calcStepSize(a,b) {
+  return (a - b) / stepsTotal;
+}
+
+// populate the rgbValues and rgbSteps objects
+function calcSteps() {
+  for (var key in rgbValues) {
+    if (rgbValues.hasOwnProperty(key)) {
+      for(var i = 0; i < 3; i++) {
+        rgbValues[key][i] = gradients[currentIndex][key][i];
+        rgbSteps[key][i] = calcStepSize(
+          gradients[nextIndex][key][i], rgbValues[key][i]
+        );
+      }
+    }
+  }
+}
+
+// update current rgb vals, update DOM element with new CSS background
+function updateGradient(){
+  // update the current rgb vals
+  for (var key in rgbValues) {
+    if (rgbValues.hasOwnProperty(key)) {
+      for(var i = 0; i < 3; i++) {
+        rgbValues[key][i] += rgbSteps[key][i];
+      }
+    }
+  }
+
+  // generate CSS rgb values
+  var tColor1 = 'rgb('+(rgbValues.start[0] | 0)+','+(rgbValues.start[1] | 0)+','+(rgbValues.start[2] | 0)+')';
+  var tColor2 = 'rgb('+(rgbValues.stop[0] | 0)+','+(rgbValues.stop[1] | 0)+','+(rgbValues.stop[2] | 0)+')';
+
+  // has anything changed on this interation
+  if (tColor1 != color1 || tColor2 != color2) {
+
+    // update cols strings
+    color1 = tColor1;
+    color2 = tColor2;
+
+    // update :root vars
+    document.documentElement.style.setProperty('--grad-1', color1);
+    document.documentElement.style.setProperty('--grad-2', color2);
+  }
+
+  // we did another step
+  stepsCount++;
+  // did we do too many steps?
+  if (stepsCount > stepsTotal) {
+    // reset steps count
+    stepsCount = 0;
+    // set new indexs
+    currentIndex = setNext(currentIndex);
+    nextIndex = setNext(nextIndex);
+    // calc steps
+    calcSteps();
+  }
+
+  window.requestAnimationFrame(updateGradient);
+}
+
+// initial step calc
+calcSteps();
+
+// go go go!
+window.requestAnimationFrame(updateGradient);
+</script>
