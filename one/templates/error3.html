@@ -2,12 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>sorry</title>
+    <title>Sorry</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            /*margin: 0 auto; /*水平居中*/
+            position: relative;
+            top: 50%; /*偏移*/
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+    </style>
+    <style type="text/css">
+        .card{cursor:pointer;margin-top:10px;width: 350px;box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);text-align: center;transition: all 0.25s;}
+        .card:hover{margin-top:0px;box-shadow: 5px 8px 5px #778899;}
+        .header{
+            background-color: #be2d1f;
+            margin:0 auto;
+            padding: 40px;
+        }
+        .body{
+           padding: 10px;
+        }
+        .card img{width: 100%;}
+    </style>
 </head>
 <body>
-<tr>
-    <td>抱歉，不能投自己</td>
-</tr>
-<a href="{{ url_for('jump3',id=uid) }}">点击我返回投票</a>
+<div class="content" align="center">
+    <div class="card" onclick="tzlinks()" >
+        <div class="header">
+
+            <a id="frelinks" style="text-decoration:none;font-size: 30px;color: #ffffff;display:block;" href="{{ url_for('jump3',id=uid) }}"  >抱歉，不能投自己</a>
+        </div>
+        <div class="body">
+           <p>点击我返回投票</p>
+        </div>
+    </div>
+    </div>
+<script type="text/javascript">
+function tzlinks(){
+var url=document.getElementById('frelinks').href;
+window.location.href=url;
+}
+</script>
 </body>
 </html>
